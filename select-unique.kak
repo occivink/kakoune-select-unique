@@ -1,4 +1,6 @@
-define-command select-unique -override -params ..2 %{
+define-command select-unique -override -params ..2 -shell-script-candidates %{
+    printf '%s\n' -strict -reverse
+} %{
     try %{
         exec -draft '<a-space><esc><a-,><esc>'
     } catch %{
