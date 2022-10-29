@@ -1,4 +1,4 @@
-define-command select-unique -override -params ..2 -shell-script-candidates %{
+define-command select-unique -override -params .. -shell-script-candidates %{
     printf '%s\n' -strict -reverse
 } %{
     try %{
@@ -82,9 +82,10 @@ my @selections_desc = read_array("%val{selections_desc}");
 #}
 
 my $main_selection_index = $ENV{"kak_main_reg_hash"} - 1; # reg_hash is 1-based
+my $main_desc = $selections_desc[0];
 my $selections_count = scalar(@selections_desc);
 for my $i ($main_selection_index .. ($selections_count - 1)) {
-    my $desc = shift @selections_desc;
+    my $desc = shift(@selections_desc);
     push(@selections_desc, $desc);
 }
 
@@ -99,7 +100,7 @@ my @result_descs;
 if ($unique_in_input) {
     my %occurrences_count;
     for my $sel (@selections) {
-        if (exists $occurrences_count{$sel}) {
+        if (exists($occurrences_count{$sel})) {
             my $prev_val = $occurrences_count{$sel};
             $occurrences_count{$sel} = $prev_val + 1;
         } else {
@@ -108,14 +109,14 @@ if ($unique_in_input) {
     }
     for my $i (0 .. scalar(@selections) - 1) {
         my $sel = $selections[$i];
-        my $desc = $selections_desc[$i];
-        if ($occurrences_count{$sel} == 1) {
-            if (!$reverse) {
-                push(@result_descs, $desc );
-            }
-        } else {
-            if ($reverse) {
-                push(@result_descs, $desc );
+        if (($occurrences_count{$sel} == 1 && !$reverse) ||
+            ($occurrences_count{$sel} != 1 && $reverse)
+        ) {
+            my $desc = $selections_desc[$i];
+            if ($desc eq $main_desc) {
+                unshift(@result_descs, $desc);
+            } else {
+                push(@result_descs, $desc);
             }
         }
     }
@@ -124,15 +125,17 @@ if ($unique_in_input) {
     my %occurred;
     for my $i (0 .. scalar(@selections) - 1) {
         my $sel = $selections[$i];
-        my $desc = $selections_desc[$i];
-        if (exists $occurred{$sel}) {
-            if ($reverse) {
-                push(@result_descs, $desc );
-            }
-        } else {
+        my $new = 0;
+        if (!exists($occurred{$sel})) {
             $occurred{$sel} = 1;
-            if (!$reverse) {
-                push(@result_descs, $desc );
+            $new = 1;
+        }
+        if (($new && !$reverse) || (!$new && $reverse)) {
+            my $desc = $selections_desc[$i];
+            if ($desc eq $main_desc) {
+                unshift(@result_descs, $desc);
+            } else {
+                push(@result_descs, $desc);
             }
         }
     }

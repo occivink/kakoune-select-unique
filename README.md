@@ -20,7 +20,7 @@ If the `-reverse` parameter is passed, the selections that are unique are instea
 
 One major difference with the `uniq` utility is that selections do not need to be consecutive to be considered unique.
 
-### Example:
+### Example
 
 Given the input `[foo] [bar] [baz] [foo]` (selections are represented using `[..]`), calling the command with different parameters will result in the following remaining selections:
 
