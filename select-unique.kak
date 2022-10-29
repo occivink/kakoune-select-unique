@@ -71,6 +71,27 @@ sub read_array {
 my @selections = read_array("%val{selections}");
 my @selections_desc = read_array("%val{selections_desc}");
 
+# in $kak_selections_desc, the main selection is at the front
+# we just put it back in its place, so that it matches $kak_selections
+
+#print("echo -debug BAD ;");
+#for my $desc (@selections_desc) {
+#    print("echo -debug $desc ;");
+#}
+
+my $main_selection_index = $ENV{"kak_main_reg_hash"} - 1; # reg_hash is 1-based
+my $selections_count = scalar(@selections_desc);
+for my $i ($main_selection_index .. ($selections_count - 1)) {
+    my $desc = shift @selections_desc;
+    push(@selections_desc, $desc);
+}
+
+#print("echo -debug GOOD? ;");
+#for my $desc (@selections_desc) {
+#    print("echo -debug $desc ;");
+#}
+#print("echo -debug OK ;");
+
 my @result_descs;
 
 if ($unique_in_input) {
@@ -120,7 +141,7 @@ if (scalar(@result_descs) == 0) {
     print("fail 'no selections remaining' ;");
 } else {
     print("select");
-    for my $desc (@result_descs) { 
+    for my $desc (@result_descs) {
         print(" '$desc'");
     }
     print(" ;");
