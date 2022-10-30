@@ -84,7 +84,6 @@ my @selections_desc = read_array("%val{selections_desc}");
 #}
 
 my $main_selection_index = $ENV{"kak_main_reg_hash"} - 1; # reg_hash is 1-based
-my $main_desc = $selections_desc[0];
 my $selections_count = scalar(@selections_desc);
 for my $i ($main_selection_index .. ($selections_count - 1)) {
     my $desc = shift(@selections_desc);
@@ -98,6 +97,7 @@ for my $i ($main_selection_index .. ($selections_count - 1)) {
 #print("echo -debug OK ;");
 
 my @result_descs;
+my $closest_selection_to_main_idx = 0;
 
 if ($unique_in_input) {
     my %occurrences_count;
@@ -114,12 +114,10 @@ if ($unique_in_input) {
         if (($occurrences_count{$sel} == 1 && !$reverse) ||
             ($occurrences_count{$sel} != 1 && $reverse)
         ) {
-            my $desc = $selections_desc[$i];
-            if ($desc eq $main_desc) {
-                unshift(@result_descs, $desc);
-            } else {
-                push(@result_descs, $desc);
+            if ($i <= $main_selection_index) {
+                $closest_selection_to_main_idx = scalar(@result_descs);
             }
+            push(@result_descs, $selections_desc[$i]);
         }
     }
 } else {
@@ -133,12 +131,10 @@ if ($unique_in_input) {
             $new = 1;
         }
         if (($new && !$reverse) || (!$new && $reverse)) {
-            my $desc = $selections_desc[$i];
-            if ($desc eq $main_desc) {
-                unshift(@result_descs, $desc);
-            } else {
-                push(@result_descs, $desc);
+            if ($i <= $main_selection_index) {
+                $closest_selection_to_main_idx = scalar(@result_descs);
             }
+            push(@result_descs, $selections_desc[$i]);
         }
     }
 }
@@ -146,13 +142,20 @@ if ($unique_in_input) {
 if (scalar(@result_descs) == 0) {
     # nothing to select, invalid input
     print("fail 'no selections remaining' ;");
-} else {
-    print("select");
-    for my $desc (@result_descs) {
-        print(" '$desc'");
-    }
-    print(" ;");
+    exit(1);
 }
+
+if ($closest_selection_to_main_idx > 0) {
+    my $new_main_desc = splice(@result_descs, $closest_selection_to_main_idx, 1);
+    unshift(@result_descs, $new_main_desc);
+}
+
+print("select");
+for my $desc (@result_descs) {
+    print(" '$desc'");
+}
+print(" ;");
+
 EOF
     }
 }
