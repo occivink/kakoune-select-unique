@@ -1,4 +1,6 @@
-define-command select-unique -override -params .. -shell-script-candidates %{
+define-command select-unique -override -params .. -docstring '
+select-unique [-strict] [-reverse]: filter selections based on uniqueness
+' -shell-script-candidates %{
     printf '%s\n' -strict -reverse
 } %{
     try %{
