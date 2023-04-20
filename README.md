@@ -33,7 +33,7 @@ select-unique -strict -reverse => [foo] bar baz [foo]
 
 ## Tests
 
-The `test.kak` file contains tests for the plugin. To execute these tests, simply run `kak -n -e 'source test.kak ; quit'`: if the kakoune instance stays open, the tests have somehow failed and the current state can be inspected.
+The `test.kak_` file contains tests for the plugin. To execute these tests, simply run `kak -n -e 'source test.kak_ ; quit'`: if the kakoune instance stays open, the tests have somehow failed and the current state can be inspected.
 
 ## License
 
